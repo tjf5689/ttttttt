@@ -1,0 +1,41 @@
+{
+  "name": "positive-energy-checkin",
+  "version": "4.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/android": "^6.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@react-native-async-storage/async-storage": "^1.23.1",
+    "@react-navigation/bottom-tabs": "^6.5.20",
+    "@react-navigation/native": "^6.1.18",
+    "@react-navigation/native-stack": "^6.9.26",
+    "react-native-gesture-handler": "^2.21.2",
+    "react-native-mmkv": "^3.0.3",
+    "react-native-reanimated": "^3.16.1",
+    "react-native-safe-area-context": "^4.10.5",
+    "react-native-screens": "^3.32.0",
+    "zustand": "^4.5.5",
+    "date-fns": "^3.6.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.0",
+    "@types/react": "^18.2.74",
+    "@types/react-dom": "^18.2.24",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8",
+    "@types/react-native": "^0.73.0"
+  }
+}
