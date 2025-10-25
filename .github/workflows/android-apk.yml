@@ -1,0 +1,73 @@
+name: Build Android Debug APK (GitHub-only)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-android-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node (auto-detect version if .nvmrc, else 18.x)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          node-version: '18'
+
+      - name: Setup Java 17 (Gradle)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Cache Node modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies (npm/yarn/pnpm auto-detect)
+        run: |
+          if [ -f yarn.lock ]; then
+            corepack enable
+            yarn --frozen-lockfile || yarn
+          elif [ -f pnpm-lock.yaml ]; then
+            corepack enable
+            pnpm i --frozen-lockfile || pnpm i
+          else
+            npm ci || npm i
+          fi
+
+      - name: Make gradlew executable
+        working-directory: android
+        run: chmod +x ./gradlew
+
+      - name: Build Debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --stacktrace --no-daemon
+
+      - name: Locate APKs
+        id: locate
+        run: |
+          echo "apk_path=$(find android/app/build/outputs/apk -type f -name "*.apk" | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          echo "debug_apk=$(find android/app/build/outputs/apk -type f -name "*debug*.apk" | head -n1)" >> $GITHUB_OUTPUT
+          echo "all_apks:"
+          find android/app/build/outputs/apk -type f -name "*.apk" -print
+
+      - name: Upload artifact (APK)
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apk
+          path: |
+            ${{ steps.locate.outputs.apk_path }}
+          if-no-files-found: error
